@@ -1,0 +1,20 @@
+{
+  "method": "TCR-ESM-compatible CDR3beta-peptide configuration",
+  "source_architecture": "Frozen esm1v_t33_650M_UR90S_1 mean embeddings; two 128-unit branches; 512/256-unit head",
+  "seeds": [13, 42, 123],
+  "aggregation": "Mean of each seed's five-fold mean; sample standard deviation across the three seed means.",
+  "strict": {
+    "auroc": {"mean": 0.508065, "seed_sd": 0.012166},
+    "auprc": {"mean": 0.507930, "seed_sd": 0.013776},
+    "f1_at_0_5": {"mean": 0.601961, "seed_sd": 0.016523},
+    "precision_at_0_5": {"mean": 0.506772, "seed_sd": 0.003419},
+    "recall_at_0_5": {"mean": 0.753639, "seed_sd": 0.053161}
+  },
+  "uniform": {
+    "auroc": {"mean": 0.689217, "seed_sd": 0.003493},
+    "auprc": {"mean": 0.682660, "seed_sd": 0.003079},
+    "f1_at_0_5": {"mean": 0.705727, "seed_sd": 0.003006},
+    "precision_at_0_5": {"mean": 0.580039, "seed_sd": 0.001325},
+    "recall_at_0_5": {"mean": 0.903046, "seed_sd": 0.007669}
+  }
+}

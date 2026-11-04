@@ -1,0 +1,44 @@
+[
+  {
+    "stage": "not_homo_sapiens",
+    "rows_before": 203308,
+    "rows_removed": 17937,
+    "rows_remaining": 185371
+  },
+  {
+    "stage": "mhc_class_not_i",
+    "rows_before": 185371,
+    "rows_removed": 5897,
+    "rows_remaining": 179474
+  },
+  {
+    "stage": "invalid_or_missing_amino_acid",
+    "rows_before": 179474,
+    "rows_removed": 25195,
+    "rows_remaining": 154279
+  },
+  {
+    "stage": "peptide_length_not_9",
+    "rows_before": 154279,
+    "rows_removed": 25935,
+    "rows_remaining": 128344
+  },
+  {
+    "stage": "cdr3_beta_length_not_10_to_18",
+    "rows_before": 128344,
+    "rows_removed": 2174,
+    "rows_remaining": 126170
+  },
+  {
+    "stage": "mhc_not_hla_a02",
+    "rows_before": 126170,
+    "rows_removed": 26877,
+    "rows_remaining": 99293
+  },
+  {
+    "stage": "duplicate_cdr3_beta_peptide",
+    "rows_before": 99293,
+    "rows_removed": 25136,
+    "rows_remaining": 74157
+  }
+]

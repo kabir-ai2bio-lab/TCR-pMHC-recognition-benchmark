@@ -1,0 +1,6 @@
+numpy>=1.26
+pandas>=2.1
+scikit-learn>=1.4
+pytest>=8.0
+# NetTCR-2.0 training is added after data audit; use a Python-version-compatible TensorFlow release.
+
