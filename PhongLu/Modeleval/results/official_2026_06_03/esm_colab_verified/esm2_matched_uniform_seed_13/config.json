@@ -1,0 +1,10 @@
+{
+  "seed": 13,
+  "architecture": "simple",
+  "epochs": 100,
+  "patience": 10,
+  "batch_size": 256,
+  "learning_rate": 0.001,
+  "balance_power": 0.0,
+  "balancing_description": "None"
+}

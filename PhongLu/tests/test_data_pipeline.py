@@ -1,7 +1,7 @@
 import pandas as pd
 import pytest
 
-from PhongLu.data.preprocessing.import_sources import import_iedb, import_vdjdb
+from PhongLu.data.preprocessing.import_sources import import_iedb, import_vdjdb, import_vdjdb_release
 from PhongLu.data.preprocessing.extract_vdjdb_v1 import build_vdjdb_v1
 from PhongLu.data.preprocessing.extract_vdjdb_structural_candidates import build_structural_candidates
 from PhongLu.data.preprocessing.preprocess import preprocess
@@ -46,6 +46,27 @@ def test_negatives_are_fold_local_and_not_positives():
     negative_pairs = set(map(tuple, result.loc[result.binder.eq(0), ["cdr3_beta", "peptide"]].itertuples(index=False, name=None)))
     assert positive_pairs.isdisjoint(negative_pairs)
     assert result.binder.value_counts().to_dict() == {1: 3, 0: 3}
+
+
+def test_negatives_exclude_external_positives_and_previous_negatives():
+    rows = pd.DataFrame({"cdr3_beta": ["A", "B", "C", "D"], "peptide": ["P", "Q", "R", "S"]})
+    known = {("B", "P")}
+    used = {("C", "P")}
+    result = add_within_fold_negatives(rows, seed=1, known_positives=known, used_negatives=used)
+    negatives = set(map(tuple, result.loc[result.binder.eq(0), ["cdr3_beta", "peptide"]].itertuples(index=False, name=None)))
+    assert ("D", "P") in negatives
+    assert not negatives.intersection(known | {("C", "P")})
+
+
+def test_official_release_mapping_and_row_provenance(tmp_path):
+    path = tmp_path / "vdjdb_full.txt"
+    path.write_text("cdr3.beta\tantigen.epitope\tmhc.a\tmhc.class\tspecies\treference.id\n"
+                    "CASSLGQETQYF\tNLVPMVATV\tHLA-A*02:01\tMHCI\tHomoSapiens\tPMID:1\n")
+    result = import_vdjdb_release(path)
+    assert result.loc[0, "source_record_id"] == "vdjdb_full.txt:2"
+    assert result.loc[0, "cdr3_beta"] == "CASSLGQETQYF"
+    filtered, audit = build_vdjdb_v1(path)
+    assert len(filtered) == 1 and audit[0]["rows_before"] == 1
 
 
 def test_missing_required_column_fails_loudly():
@@ -105,3 +126,17 @@ def test_structural_candidate_extraction_requires_paired_chains_and_vj_genes(tmp
     assert result.loc[0, "v_beta"] == "TRBV7-9"
     assert result.loc[0, "label"] == 1
     assert audit[-2]["stage"] == "missing_alpha_or_beta_vj_gene"
+
+
+def test_structural_candidate_official_release_without_chunk_id(tmp_path):
+    path = tmp_path / "vdjdb_full.txt"
+    path.write_text(
+        "cdr3.alpha\tv.alpha\tj.alpha\tcdr3.beta\tv.beta\tj.beta\t"
+        "antigen.epitope\tmhc.a\tmhc.class\tspecies\treference.id\n"
+        "CAVRDSNYQLIW\tTRAV12-2\tTRAJ33\tCASSLGQETQYF\tTRBV7-9\tTRBJ2-7\t"
+        "NLVPMVATV\tHLA-A*02:01\tMHCI\tHomoSapiens\tPMID:1\n"
+    )
+    result, _ = build_structural_candidates(path)
+    assert len(result) == 1
+    assert result.loc[0, "source_file"] == "VDJDB_FULL.TXT"
+    assert result.loc[0, "source_chunk_id"] == "2"

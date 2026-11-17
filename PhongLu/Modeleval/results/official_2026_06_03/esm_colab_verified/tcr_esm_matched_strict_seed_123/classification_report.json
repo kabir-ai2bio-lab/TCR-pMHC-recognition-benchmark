@@ -1,0 +1,43 @@
+{
+  "description": "Pooled out-of-fold classification report; one prediction per held-out row",
+  "threshold": 0.5,
+  "negative_label_caveat": "Synthetic negatives are not verified non-binders.",
+  "n_rows": 22592,
+  "confusion_matrix_rows_true_columns_predicted": [
+    [
+      4312,
+      6984
+    ],
+    [
+      4049,
+      7247
+    ]
+  ],
+  "classification_report": {
+    "synthetic_negative": {
+      "precision": 0.5157277837579237,
+      "recall": 0.38172804532577903,
+      "f1-score": 0.4387241186345831,
+      "support": 11296.0
+    },
+    "reported_positive": {
+      "precision": 0.5092403906963671,
+      "recall": 0.6415545325779037,
+      "f1-score": 0.567790966427704,
+      "support": 11296.0
+    },
+    "accuracy": 0.5116412889518414,
+    "macro avg": {
+      "precision": 0.5124840872271454,
+      "recall": 0.5116412889518414,
+      "f1-score": 0.5032575425311435,
+      "support": 22592.0
+    },
+    "weighted avg": {
+      "precision": 0.5124840872271454,
+      "recall": 0.5116412889518414,
+      "f1-score": 0.5032575425311436,
+      "support": 22592.0
+    }
+  }
+}

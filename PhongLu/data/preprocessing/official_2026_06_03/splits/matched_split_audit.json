@@ -1,0 +1,74 @@
+{
+  "seed": 13,
+  "same_positive_pool_rows": 11296,
+  "same_unique_peptides": 213,
+  "removed_peptides_fewer_than_5": 702,
+  "strict_downsampling": [
+    {
+      "rows_before": 73654,
+      "rows_after": 35346,
+      "per_peptide_cap": 4910
+    },
+    {
+      "rows_before": 35346,
+      "rows_after": 22576,
+      "per_peptide_cap": 2356
+    },
+    {
+      "rows_before": 22576,
+      "rows_after": 17520,
+      "per_peptide_cap": 1505
+    },
+    {
+      "rows_before": 17520,
+      "rows_after": 15161,
+      "per_peptide_cap": 1168
+    },
+    {
+      "rows_before": 15161,
+      "rows_after": 13954,
+      "per_peptide_cap": 1010
+    },
+    {
+      "rows_before": 13954,
+      "rows_after": 13314,
+      "per_peptide_cap": 930
+    },
+    {
+      "rows_before": 13314,
+      "rows_after": 12970,
+      "per_peptide_cap": 887
+    },
+    {
+      "rows_before": 12970,
+      "rows_after": 12786,
+      "per_peptide_cap": 864
+    },
+    {
+      "rows_before": 12786,
+      "rows_after": 12690,
+      "per_peptide_cap": 852
+    },
+    {
+      "rows_before": 12690,
+      "rows_after": 12642,
+      "per_peptide_cap": 846
+    },
+    {
+      "rows_before": 12642,
+      "rows_after": 12610,
+      "per_peptide_cap": 842
+    },
+    {
+      "rows_before": 12610,
+      "rows_after": 12594,
+      "per_peptide_cap": 840
+    },
+    {
+      "rows_before": 12594,
+      "rows_after": 12586,
+      "per_peptide_cap": 839
+    }
+  ],
+  "negative_strategy": "fold-local rearrangement; exclude full positive pool and prior-fold negatives"
+}

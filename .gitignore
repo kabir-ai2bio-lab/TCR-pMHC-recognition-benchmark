@@ -11,3 +11,4 @@ checkpoints/
 *.ckpt
 *.npz
 .env
+work/

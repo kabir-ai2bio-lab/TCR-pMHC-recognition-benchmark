@@ -1,0 +1,10 @@
+{
+  "seed": 42,
+  "architecture": "tcr-esm",
+  "epochs": 600,
+  "patience": 10,
+  "batch_size": 512,
+  "learning_rate": 0.009,
+  "balance_power": 0.0,
+  "balancing_description": "None"
+}

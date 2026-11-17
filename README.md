@@ -12,4 +12,6 @@ PhongLu/
 └── requirements.txt          base data-processing dependencies
 ```
 
-Start with [PhongLu/README.md](PhongLu/README.md) for data access, evaluation protocols, Colab notes, and commands. The uploaded Version-1 results are development results; their negative-sampling limitation is documented there.
+Start with [PhongLu/README.md](PhongLu/README.md) for data access, evaluation protocols, Colab notes, and commands. Synthetic-negative and reproducibility limitations are documented there.
+
+The official VDJdb release rebuild is described in [OFFICIAL_RELEASE.md](PhongLu/data/preprocessing/OFFICIAL_RELEASE.md). NetTCR, ESM-2, and TCR-ESM-style results are summarized in the [verified comparison](PhongLu/Modeleval/results/official_2026_06_03/VERIFIED_MODEL_COMPARISON.md). STAG has not yet been evaluated on the official-release dataset.

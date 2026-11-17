@@ -36,7 +36,7 @@ def stage(data: pd.DataFrame, mask: pd.Series, name: str) -> tuple[pd.DataFrame,
 
 
 def read_chunks(chunks_dir: Path) -> pd.DataFrame:
-    """Read raw VDJdb submission chunks without building the full VDJdb release."""
+    """Read a submission-chunk directory or one official vdjdb_full.txt file."""
     frames = []
     fields = {
         "chunk.id": "source_chunk_id", "reference.id": "source_reference",
@@ -46,7 +46,8 @@ def read_chunks(chunks_dir: Path) -> pd.DataFrame:
         "cdr3.beta": "cdr3_beta", "v.beta": "v_beta", "d.beta": "d_beta",
         "j.beta": "j_beta", "meta.structure.id": "structure_id",
     }
-    for path in sorted(chunks_dir.glob("*.txt")):
+    input_files = [chunks_dir] if chunks_dir.is_file() else sorted(chunks_dir.glob("*.txt"))
+    for path in input_files:
         raw = pd.read_csv(path, sep="\t", dtype=str, keep_default_na=False, low_memory=False)
         required = {"species", "mhc.a", "mhc.class", "antigen.epitope", "cdr3.alpha", "cdr3.beta"}
         missing = required.difference(raw.columns)
@@ -55,6 +56,8 @@ def read_chunks(chunks_dir: Path) -> pd.DataFrame:
         frame = pd.DataFrame(index=raw.index)
         for source, destination in fields.items():
             frame[destination] = raw[source] if source in raw else ""
+        if "chunk.id" not in raw:
+            frame["source_chunk_id"] = [str(row + 2) for row in range(len(raw))]
         frame["source_file"] = path.name
         frames.append(frame)
     if not frames:
@@ -97,11 +100,13 @@ def build_structural_candidates(chunks_dir: Path) -> tuple[pd.DataFrame, list[di
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--chunks-dir", type=Path, default=Path("data/raw/vdjdb/vdjdb-db-master/chunks"))
+    sources = parser.add_mutually_exclusive_group(required=True)
+    sources.add_argument("--chunks-dir", type=Path, help="Legacy submission chunk folder")
+    sources.add_argument("--full-file", type=Path, help="Official vdjdb_full.txt release file")
     parser.add_argument("--output", type=Path, default=Path("data/interim/vdjdb_paired_structural_candidates.csv"))
     parser.add_argument("--audit", type=Path, default=Path("data/interim/vdjdb_paired_structural_audit.json"))
     args = parser.parse_args()
-    candidates, audit = build_structural_candidates(args.chunks_dir)
+    candidates, audit = build_structural_candidates(args.full_file or args.chunks_dir)
     args.output.parent.mkdir(parents=True, exist_ok=True)
     candidates.to_csv(args.output, index=False)
     report = {

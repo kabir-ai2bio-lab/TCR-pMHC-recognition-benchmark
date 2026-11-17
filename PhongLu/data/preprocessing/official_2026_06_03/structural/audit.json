@@ -1,0 +1,51 @@
+{
+  "purpose": "STAG-style structural pilot candidates; not a replacement for the existing CDR3beta-only benchmark.",
+  "filters": [
+    {
+      "stage": "not_homo_sapiens",
+      "rows_before": 192753,
+      "rows_removed": 16623,
+      "rows_remaining": 176130
+    },
+    {
+      "stage": "mhc_class_not_i",
+      "rows_before": 176130,
+      "rows_removed": 5846,
+      "rows_remaining": 170284
+    },
+    {
+      "stage": "mhc_not_hla_a02",
+      "rows_before": 170284,
+      "rows_removed": 46914,
+      "rows_remaining": 123370
+    },
+    {
+      "stage": "peptide_length_not_9",
+      "rows_before": 123370,
+      "rows_removed": 11712,
+      "rows_remaining": 111658
+    },
+    {
+      "stage": "missing_or_invalid_cdr3_alpha_beta_or_peptide",
+      "rows_before": 111658,
+      "rows_removed": 56191,
+      "rows_remaining": 55467
+    },
+    {
+      "stage": "missing_alpha_or_beta_vj_gene",
+      "rows_before": 55467,
+      "rows_removed": 115,
+      "rows_remaining": 55352
+    },
+    {
+      "stage": "duplicate_alpha_beta_peptide_mhc",
+      "rows_before": 55352,
+      "rows_removed": 5766,
+      "rows_remaining": 49586
+    }
+  ],
+  "final_rows": 49586,
+  "unique_cdr3_alpha_beta_pairs": 48832,
+  "unique_peptides": 849,
+  "unique_mhc_a": 9
+}

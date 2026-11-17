@@ -82,6 +82,26 @@ def import_vdjdb(chunks_dir: Path) -> pd.DataFrame:
     return pd.concat(records, ignore_index=True)[COMMON_COLUMNS]
 
 
+def import_vdjdb_release(path: Path) -> pd.DataFrame:
+    """Read the official paired-row release, preserving its 1-based file row."""
+    raw = pd.read_csv(path, sep="\t", dtype=str, keep_default_na=False, low_memory=False)
+    required = {"cdr3.beta", "antigen.epitope", "mhc.a", "mhc.class", "species", "reference.id"}
+    missing = required.difference(raw.columns)
+    if missing:
+        raise ValueError(f"{path} lacks required VDJdb columns: {sorted(missing)}")
+    return pd.DataFrame({
+        "cdr3_beta": _text(raw["cdr3.beta"]),
+        "peptide": _text(raw["antigen.epitope"]),
+        "mhc": _text(raw["mhc.a"]),
+        "species": _text(raw["species"]),
+        "mhc_class": _text(raw["mhc.class"]),
+        "source": "vdjdb_official_release",
+        "source_record_id": [f"{path.name}:{row + 2}" for row in range(len(raw))],
+        "source_reference": _text(raw["reference.id"]),
+        "source_evidence": "vdjdb_full_release_record",
+    })[COMMON_COLUMNS]
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--iedb", type=Path, default=Path("data/raw/iedb/tcr_full_v3.csv"))

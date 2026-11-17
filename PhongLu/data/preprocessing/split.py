@@ -50,22 +50,28 @@ def make_folds(positives: pd.DataFrame, strategy: str, n_folds: int = 5, seed: i
     return data
 
 
-def add_within_fold_negatives(fold_data: pd.DataFrame, seed: int) -> pd.DataFrame:
+def add_within_fold_negatives(fold_data: pd.DataFrame, seed: int, known_positives=None, used_negatives=None) -> pd.DataFrame:
     """Create one non-cognate rearranged pair per positive without leaving its fold."""
     rng = np.random.default_rng(seed)
     positives = fold_data[["cdr3_beta", "peptide"]].drop_duplicates().copy()
     known = set(map(tuple, positives.itertuples(index=False, name=None)))
+    if known_positives is not None:
+        known.update(known_positives)
+    if used_negatives is None:
+        used_negatives = set()
     tcr_pool = positives.cdr3_beta.unique()
     negative_rows = []
     for peptide, group in positives.groupby("peptide", sort=False):
-        candidates = np.array([tcr for tcr in tcr_pool if (tcr, peptide) not in known])
+        candidates = np.array([tcr for tcr in tcr_pool if (tcr, peptide) not in known and (tcr, peptide) not in used_negatives])
         if len(candidates) < len(group):
             raise RuntimeError(
                 f"Cannot generate {len(group)} unique fold-local negatives for peptide {peptide}; "
                 f"only {len(candidates)} non-cognate TCR candidates exist"
             )
         selected = rng.choice(candidates, size=len(group), replace=False)
-        negative_rows.extend((str(tcr), peptide) for tcr in selected)
+        new_pairs = [(str(tcr), peptide) for tcr in selected]
+        negative_rows.extend(new_pairs)
+        used_negatives.update(new_pairs)
     negatives = pd.DataFrame(negative_rows, columns=["cdr3_beta", "peptide"])
     negatives["binder"] = 0
     positives["binder"] = 1
@@ -81,8 +87,10 @@ def main() -> None:
     args = parser.parse_args()
     positive = pd.read_csv(args.input)
     folds = make_folds(positive, args.strategy, seed=args.seed)
+    known = set(map(tuple, positive[["cdr3_beta", "peptide"]].itertuples(index=False, name=None)))
+    used = set()
     for fold in range(5):
-        part = add_within_fold_negatives(folds.loc[folds.fold.eq(fold)], args.seed + fold)
+        part = add_within_fold_negatives(folds.loc[folds.fold.eq(fold)], args.seed + fold, known, used)
         part["fold"] = fold
         args.output_dir.mkdir(parents=True, exist_ok=True)
         part.to_csv(args.output_dir / f"{args.strategy}_fold_{fold}.csv", index=False)

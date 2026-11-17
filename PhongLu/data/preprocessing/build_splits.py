@@ -29,10 +29,12 @@ def downsample_for_strict(data: pd.DataFrame, n_folds: int, seed: int) -> tuple[
     return current, audit
 
 
-def _write_with_negatives(folds: pd.DataFrame, strategy: str, output_dir: Path, seed: int) -> None:
+def _write_with_negatives(folds: pd.DataFrame, strategy: str, output_dir: Path, seed: int, all_positives: pd.DataFrame) -> None:
     parts = []
+    known = set(map(tuple, all_positives[["cdr3_beta", "peptide"]].itertuples(index=False, name=None)))
+    used = set()
     for fold in sorted(folds.fold.unique()):
-        part = add_within_fold_negatives(folds.loc[folds.fold.eq(fold)], seed + int(fold))
+        part = add_within_fold_negatives(folds.loc[folds.fold.eq(fold)], seed + int(fold), known, used)
         part["fold"] = fold
         parts.append(part)
     output_dir.mkdir(parents=True, exist_ok=True)
@@ -49,16 +51,16 @@ def main() -> None:
     strict_input, strict_audit = downsample_for_strict(data, 5, args.seed)
     strict = make_folds(strict_input, "strict", seed=args.seed)
     assert_strict_no_leakage(strict)
-    _write_with_negatives(strict, "strict", args.output_dir, args.seed)
+    _write_with_negatives(strict, "strict", args.output_dir, args.seed, data)
     counts = data.peptide.value_counts()
     uniform_input = data.loc[data.peptide.isin(counts[counts >= 5].index)].copy()
     uniform = make_folds(uniform_input, "uniform", seed=args.seed)
-    _write_with_negatives(uniform, "uniform", args.output_dir, args.seed)
+    _write_with_negatives(uniform, "uniform", args.output_dir, args.seed, data)
     audit = {
         "seed": args.seed,
         "strict": {"positive_rows": len(strict_input), "downsampling": strict_audit},
         "uniform": {"positive_rows": len(uniform_input), "removed_peptides_with_fewer_than_5": int((counts < 5).sum())},
-        "negative_strategy": "one fold-local shuffled negative per positive",
+        "negative_strategy": "one fold-local shuffled negative per positive; exclude full positive pool and prior-fold negatives",
     }
     (args.output_dir / "split_audit.json").write_text(json.dumps(audit, indent=2) + "\n")
     print(f"Strict positives: {len(strict_input):,}; uniform positives: {len(uniform_input):,}")
